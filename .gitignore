@@ -1,1 +1,14 @@
-data-raw
+# Downloaded dataset (fetched on demand by R/download_data.R)
+data-raw/
+data_v2/
+data_v2.zip
+
+# R session artifacts
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+
+# Editor swap/backup files
+*.swp
+*~
