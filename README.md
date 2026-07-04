@@ -6,6 +6,8 @@ This is a simple test case of using agentic AI to perform amortised simulation-b
 
 The main branch will contain the code and information prior to engaging agentic AI to support SBI. Worked agentic SBI analyses, with different versions of the above agent kit, will be stored on different branches.
 
+Because this is a test of agentic AI, we keep a record of the conversations that produced the code. The phase 1 setup conversation(s) are saved under [`conversations/phase1/`](conversations/), and each phase 2 SBI experiment saves its conversation under [`conversations/phase2/`](conversations/), named after that experiment's branch. These records are written by [`scripts/save-conversation.sh`](scripts/save-conversation.sh) at the end of an experiment; see [`AGENTS.md`](AGENTS.md) for the workflow.
+
 Note that the author is not an expert in exercise physiology, and the use case is a toy example, so the assumptions made in constructing this model should not be considered as remotely authoritative. Agentic AI is also being used to rapidly implement the initial code for this toy example and write documentation, so errors may well occur there too.
 
 Below we define the model and data considered in this repo.
