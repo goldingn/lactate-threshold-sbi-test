@@ -24,85 +24,93 @@ We define simple two-compartment model of lactate levels in muscle and blood, wi
 
 ### Process model:
 
-We model kinetics of the concentration of lactate (mmol.L^-1) in the muscle (C_m) and blood (C_b) during exercise via three processes: lactate genertion in muscle, lactate transfer from muscle to blood, and lactate clearing from blood.
+We model kinetics of the concentration of lactate (mmol·L⁻¹) in the muscle ($C_m$) and blood ($C_b$) during exercise via three processes: lactate genertion in muscle, lactate transfer from muscle to blood, and lactate clearing from blood.
 
 #### Lactate generation in muscle
 
-We parameterise the rate of lactate concentration accumulation in the muscle compartment (mmol.L^-1.min^-1) as \lambda, which we can model as linear in heart rate h(t) at time t, as a proxy for the amount of work being done by the muscle:
+We parameterise the rate of lactate concentration accumulation in the muscle compartment (mmol·L⁻¹·min⁻¹) as $\lambda$, which we can model as linear in heart rate $h(t)$ at time $t$, as a proxy for the amount of work being done by the muscle:
 
-  \lambda(t) = \alpha + \beta h(t)
+$$\lambda(t) = \alpha + \beta\, h(t)$$
 
-where \alpha and \beta are unconstrained (real-valued) free scalar parameters. This term governs external forcing of lactate in the system.
+where $\alpha$ and $\beta$ are unconstrained (real-valued) free scalar parameters. This term governs external forcing of lactate in the system.
 
 #### Lactate transfer
 
-We model the rate of transfer of lactate mass (mmol.min^-1, note: not concentration) away from muscle and into blood as proportional to the chemical gradient (difference in concentration between muscle and blood) and a unitless 'permeability parameter' P_m:
+We model the rate of transfer of lactate mass (mmol·min⁻¹, note: not concentration) away from muscle and into blood as proportional to the chemical gradient (difference in concentration between muscle and blood) and a unitless 'permeability parameter' $P_m$:
 
-  \eta_m = P_m (C_m - C_b)
+$$\eta_m = P_m\,(C_m - C_b)$$
 
 #### Lactate clearance
 
-At 'low' blood lactate concentrations (below some threshold transport rate \eta_{threshold}), lactate is modelled as being cleared from the blood with some permeability P_b, proportionally to its concentration above a minimum value C_{min}; analagous to a permeable membrane with a fixed low concentration in on the other side. However at high blood lactate concentrations this membrane saturates, and the gradient can no longer increase. We model this with a tanh function, and the threshold transport rate:
+At 'low' blood lactate concentrations (below some threshold transport rate $\eta_{\text{threshold}}$), lactate is modelled as being cleared from the blood with some permeability $P_b$, proportionally to its concentration above a minimum value $C_{\min}$; analagous to a permeable membrane with a fixed low concentration in on the other side. However at high blood lactate concentrations this membrane saturates, and the gradient can no longer increase. We model this with a tanh function, and the threshold transport rate:
 
-  \eta_b = \eta_{threshold} tanh(P_b (C_b - C_{min}) / \eta_{threshold})
+$$\eta_b = \eta_{\text{threshold}} \, \tanh\left(\frac{P_b\,(C_b - C_{\min})}{\eta_{\text{threshold}}}\right)$$
 
 #### Kinetics
 
 We model the lactate kinetics with two differential equations on the concentrations of lactate in muscle and in blood, by adjusting these absolute flow rates to the concentrations of the respective compartments:
 
-  dC_m/dt = \lambda - \eta_m / V_m
-  dC_b/dt = \eta_m / V_b - eta_b / V_b
+$$
+\begin{aligned}
+\frac{dC_m}{dt} &= \lambda - \frac{\eta_m}{V_m} \\
+\frac{dC_b}{dt} &= \frac{\eta_m}{V_b} - \frac{\eta_b}{V_b}
+\end{aligned}
+$$
 
 #### Reparameterisation
 
-This system has 8 unknown parameters: V_m, V_b, P_m, P_b, C_{min}, \eta_{threshold}, \alpha, \beta. While some can be jointly inferred from heart rate and blood lactate data, others are not identified. In particular, the total volumes of muscle and blood cannot be identified from only concentration data. We therefore reparameterise this relative to the. uscle volume V_m.
+This system has 8 unknown parameters: $V_m$, $V_b$, $P_m$, $P_b$, $C_{\min}$, $\eta_{\text{threshold}}$, $\alpha$, $\beta$. While some can be jointly inferred from heart rate and blood lactate data, others are not identified. In particular, the total volumes of muscle and blood cannot be identified from only concentration data. We therefore reparameterise this relative to the muscle volume $V_m$.
 
-We define rho as the ratio of blood to muscle volumes:
-  \rho = V_b / V_m
+We define $\rho$ as the ratio of blood to muscle volumes:
+
+$$\rho = \frac{V_b}{V_m}$$
 
 We scale the permeability and threshold transfer parameters by the blood volume:
-  a_m = P_m / V_b
-  a_b = P_b / V_b
-  r_b = \eta_{threshold} / V_b
 
-since:
-  P_m / V_m = (P_m / V_b) (V_b / V_m) = \rho a_m 
+$$a_m = \frac{P_m}{V_b}, \qquad a_b = \frac{P_b}{V_b}, \qquad r_b = \frac{\eta_{\text{threshold}}}{V_b}$$
+
+since
+
+$$\frac{P_m}{V_m} = \frac{P_m}{V_b} \cdot \frac{V_b}{V_m} = \rho\, a_m$$
 
 we have the reparameterised model:
 
-  dC_m/dt = \lambda - \rho a_m (C_m - C_b)
-  dC_b/dt = a_m (C_m - C_b) - r_b tanh(a_b (C_b - C_{min}) / r_b)
+$$
+\begin{aligned}
+\frac{dC_m}{dt} &= \lambda - \rho\, a_m\,(C_m - C_b) \\
+\frac{dC_b}{dt} &= a_m\,(C_m - C_b) - r_b \, \tanh\left(\frac{a_b\,(C_b - C_{\min})}{r_b}\right)
+\end{aligned}
+$$
 
 with one fewer parameter:
- \rho > 0
- a_m > 0
- a_b > 0
- r_b > 0
- C_{min} > 0
- \alpha
- \beta > 0
 
-where beta must be positive because the increase in lactate concentration is assumed to increase with heart rate, and others are positive by construction (ratios and rates).
+$$\rho > 0, \quad a_m > 0, \quad a_b > 0, \quad r_b > 0, \quad C_{\min} > 0, \quad \alpha \in \mathbb{R}, \quad \beta > 0$$
+
+where $\beta$ must be positive because the increase in lactate concentration is assumed to increase with heart rate, and the others are positive by construction (ratios and rates).
 
 ### Sampling model
 
 The data available to infer these parameters are from graded incremental exercise tests for various participants in cycling and running. The protocol has participants warm up, stand stationary for 3 minutes, and then perform a continuous series of 3 minute efforts with increasing exercise intensity. Two relevant types of data are collected for each of these 3 minute periods (stationary and efforts)
 Two types of data are available for each period, for each participant:
  - average heart rate over the period, in beats per minute (bpm)
- - the measured concentration of lactate in the blood in millimoles per litre (mmol.L^-1) in a small blood sample taken at the end of the 3 minute period.
+ - the measured concentration of lactate in the blood in millimoles per litre (mmol·L⁻¹) in a small blood sample taken at the end of the 3 minute period.
 
-Since the amount of work is kept roughly constant within each period, we convert the average heart rate measuements into a piecewise constant continuous function on time: h(t). Given the reparameterised process equations and parameters listed above, we model a continuous-time function of blood lactate concentration as:
+Since the amount of work is kept roughly constant within each period, we convert the average heart rate measuements into a piecewise constant continuous function on time: $h(t)$. Given the reparameterised process equations and parameters listed above, we model a continuous-time function of blood lactate concentration as:
 
-  \lambda(t) = \alpha + \beta h(t)
-  C_b(t) = \int_0^t dC_b/dt dt
+$$
+\begin{aligned}
+\lambda(t) &= \alpha + \beta\, h(t) \\
+C_b(t) &= C_b(0) + \int_0^t \frac{dC_b}{ds}\, ds
+\end{aligned}
+$$
 
-We define a Gaussian sampling model for each blood lactate concentration measurement B_i using this modelled function, where t(i) denotes the time corresponding to blood lactate observation i - the end of each 3 minute period - and an observation standard deviation parameter \sigma:
+We define a Gaussian sampling model for each blood lactate concentration measurement $B_i$ using this modelled function, where $t(i)$ denotes the time corresponding to blood lactate observation $i$ — the end of each 3 minute period — and an observation standard deviation parameter $\sigma$:
 
-  B_i ~ N(C_b(t(i)), \sigma^2)
+$$B_i \sim \mathcal{N}\left(C_b(t(i)),\, \sigma^2\right)$$
 
 ### Priors
 
-We should be able to define an informative prior on sigma from literature on the measurement error of lactate tests. For all other parameters we will have to define reasonable priors by prior predictive checking. As a heuristic, blood lactate in a sports setting (ie. not in a medical emergency) has been observed as high as 32 mmol.L^-1 [(Osnes & Hermansen, 1972)](https://doi.org/10.1152/jappl.1972.32.1.59).
+We should be able to define an informative prior on sigma from literature on the measurement error of lactate tests. For all other parameters we will have to define reasonable priors by prior predictive checking. As a heuristic, blood lactate in a sports setting (ie. not in a medical emergency) has been observed as high as 32 mmol·L⁻¹ [(Osnes & Hermansen, 1972)](https://doi.org/10.1152/jappl.1972.32.1.59).
 
 ## Data
 
