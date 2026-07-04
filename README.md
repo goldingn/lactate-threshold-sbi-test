@@ -70,14 +70,15 @@ since:
 
 we have the reparameterised model:
 
-  dC_m/dt = \lambda - \rho a_m (C_b - C_m)
-  dC_b/dt = a_m (C_b - C_m) - r_b tanh(a_b (C_b - C_{min}) / r_b)
+  dC_m/dt = \lambda - \rho a_m (C_m - C_b)
+  dC_b/dt = a_m (C_m - C_b) - r_b tanh(a_b (C_b - C_{min}) / r_b)
 
-with two fewer parameters:
+with one fewer parameter:
  \rho > 0
  a_m > 0
  a_b > 0
  r_b > 0
+ C_{min} > 0
  \alpha
  \beta > 0
 
